@@ -1,4 +1,5 @@
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,30 +11,30 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { useState } from "react";
+import { useAtom } from "jotai";
+import { selectedGroupAtom } from "../../../atoms";
 
 export default function CreateScreen() {
+  const [group, setGroup] = useAtom(selectedGroupAtom);
+
   const [title, setTitle] = useState<string>("");
   const [bodyText, setBodyText] = useState<string>("");
 
   const goBack = () => {
-    setTitle("")
-    setBodyText("")
-    router.back()
-  }
+    setTitle("");
+    setBodyText("");
+    setGroup(null)
+    router.back();
+  };
 
   return (
     <SafeAreaView
       style={{ backgroundColor: "white", flex: 1, paddingHorizontal: 10 }}
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <AntDesign
-          name="close"
-          size={30}
-          color={"black"}
-          onPress={goBack}
-        />
+        <AntDesign name="close" size={30} color={"black"} onPress={goBack} />
         <Pressable style={{ marginLeft: "auto" }}>
           <Text style={styles.postText}>Post</Text>
         </Pressable>
@@ -48,10 +49,24 @@ export default function CreateScreen() {
           style={{ paddingVertical: 15 }}
         >
           {/* COMMUNITY SELECTOR */}
-          <View style={styles.communityContainer}>
-            <Text style={styles.rStyles}>r/</Text>
-            <Text style={{ fontWeight: 600 }}>Select a community</Text>
-          </View>
+          <Link href={"GroupSelector"} asChild>
+            <Pressable style={styles.communityContainer}>
+              {group ? (
+                <>
+                  <Image
+                    source={{ uri: group.image }}
+                    style={{ width: 20, height: 20, borderRadius: 10 }}
+                  />
+                  <Text style={{fontWeight: 600}}>{group.name}</Text>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.rStyles}>r/</Text>
+                  <Text style={{ fontWeight: 600 }}>Select a community</Text>
+                </>
+              )}
+            </Pressable>
+          </Link>
 
           {/* INPUTS */}
           <TextInput
